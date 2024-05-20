@@ -10,7 +10,7 @@ from PIL import Image
 from tqdm import tqdm
 os.environ["OPENCV_IO_ENABLE_OPENEXR"]="1"
 
-from unidepth.models import UniDepthV1
+from unidepth.models import UniDepthV1, UniDepthV2
 from unidepth.utils import colorize, image_grid
 from unidepth.utils.visualization import get_pointcloud_from_rgbd, save_file_ply
 
@@ -102,10 +102,17 @@ if __name__ == "__main__":
     parser.add_argument("--output_folder", type=str, required=True)
     parser.add_argument("--intrinsics_file", type=str, default=None)
     parser.add_argument("--save_ply", action="store_true")
+    parser.add_argument("--model", type=str, default="unidepth_v1", choices=["unidepth_v1", "unidepth_v2"])
     args = parser.parse_args()
     
     print("Torch version:", torch.__version__)
-    model = UniDepthV1.from_pretrained("lpiccinelli/unidepth-v1-vitl14")
+    if args.model == "unidepth_v1":
+        model = UniDepthV1.from_pretrained("lpiccinelli/unidepth-v1-vitl14")
+    elif args.model == "unidepth_v2": 
+        model = UniDepthV2.from_pretrained("lpiccinelli/unidepth-v2-vitl14")
+    else:
+        raise ValueError(f"Unknown model: {args.model}")
+        
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = model.to(device)
     
