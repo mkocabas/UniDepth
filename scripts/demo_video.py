@@ -38,7 +38,10 @@ def demo_single_img(model, img_f, out_f, save_ply=False, cam_intrinsics=None):
 
     # get GT and pred
     depth_pred = predictions["depth"].squeeze().cpu().numpy()
-    intrinsics = predictions["intrinsics"].squeeze().cpu().numpy()
+    if 'intrinsics' in predictions:
+        intrinsics = predictions["intrinsics"].squeeze().cpu().numpy()
+    elif 'K' in predictions:
+        intrinsics = predictions["K"].squeeze().cpu().numpy()
     # print("intrinsics:", intrinsics)
         
     pc = get_pointcloud_from_rgbd(rgb, depth_pred, None, intrinsics)
